@@ -14,5 +14,10 @@ public class Main {
         System.out.println(grafo);
         grafo.exibeMatrizAdjacencia();
         grafo.exibeMatrizIncidencia();
+
+System.out.println("\nExiste caminho de 1 a 5? " + grafo.existeCaminho("1", "5"));
+System.out.println("Existe caminho de 2 a 4? " + grafo.existeCaminho("2", "4"));
+System.out.println("Comprimento de 1 a 5: " + grafo.comprimentoCaminho("1", "5"));
+System.out.println("Comprimento de 2 a 4: " + grafo.comprimentoCaminho("2", "4"));
     }
 }
