@@ -201,6 +201,62 @@ public class Grafo {
         System.out.println(matriz);
     }
 
+    public boolean existeCaminho(String nomeOrigem, String nomeDestino) {
+        Vertice origem = encontraVertice(nomeOrigem).orElseThrow(
+                () -> new IllegalArgumentException("Vértice " + nomeOrigem + " não encontrado."));
+        Vertice destino = encontraVertice(nomeDestino).orElseThrow(
+                () -> new IllegalArgumentException("Vértice " + nomeDestino + " não encontrado."));
+
+        if (origem.equals(destino)) return true;
+
+        Set<Vertice> visitados = new HashSet<>();
+        Queue<Vertice> fila = new LinkedList<>();
+        fila.add(origem);
+        visitados.add(origem);
+
+        while (!fila.isEmpty()) {
+            Vertice atual = fila.poll();
+            for (Vertice vizinho : atual.getAdjacencias()) {
+                if (vizinho.equals(destino)) return true;
+                if (!visitados.contains(vizinho)) {
+                    visitados.add(vizinho);
+                    fila.add(vizinho);
+                }
+            }
+        }
+        return false;
+    }
+
+    public int comprimentoCaminho(String nomeOrigem, String nomeDestino) {
+        Vertice origem = encontraVertice(nomeOrigem).orElseThrow(
+                () -> new IllegalArgumentException("Vértice " + nomeOrigem + " não encontrado."));
+        Vertice destino = encontraVertice(nomeDestino).orElseThrow(
+                () -> new IllegalArgumentException("Vértice " + nomeDestino + " não encontrado."));
+
+        if (origem.equals(destino)) return 0;
+
+        Set<Vertice> visitados = new HashSet<>();
+        Queue<Vertice> fila = new LinkedList<>();
+        Map<Vertice, Integer> distancia = new HashMap<>();
+
+        fila.add(origem);
+        visitados.add(origem);
+        distancia.put(origem, 0);
+
+        while (!fila.isEmpty()) {
+            Vertice atual = fila.poll();
+            for (Vertice vizinho : atual.getAdjacencias()) {
+                if (!visitados.contains(vizinho)) {
+                    visitados.add(vizinho);
+                    distancia.put(vizinho, distancia.get(atual) + 1);
+                    if (vizinho.equals(destino)) return distancia.get(vizinho);
+                    fila.add(vizinho);
+                }
+            }
+        }
+        return -1;
+    }
+
     @Override
     public String toString() {
         return """
