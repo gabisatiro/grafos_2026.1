@@ -315,79 +315,73 @@ public class Grafo {
         return false;
     }
 
-    public List<String> dfsIterativo(String origem, String destino) {
-        Vertice verticeOrigem = encontraVertice(origem).orElseThrow(
-                () -> new IllegalArgumentException("Vertice " + origem + " não encontrado."));
-        Vertice verticeDestino = destino == null ? null : encontraVertice(destino).orElseThrow(
-                () -> new IllegalArgumentException("Vertice " + destino + " não encontrado."));
+public List<String> dfsIterativo(String origem, String destino) {
 
-        Stack<Vertice> pilha = new Stack<>();
-        List<Vertice> visitados = new ArrayList<>();
-        StringBuilder percurso = new StringBuilder("Percurso = ");
+    Vertice verticeOrigem = encontraVertice(origem).orElseThrow(
+            () -> new IllegalArgumentException("Vertice " + origem + " não encontrado."));
 
-        visitados.add(verticeOrigem);
-        pilha.push(verticeOrigem);
+    List<Vertice> visitados = new ArrayList<>();
+    Stack<Vertice> pilha = new Stack<>();
 
-        percurso.append(verticeOrigem.getNome()).append(", ");
+    pilha.push(verticeOrigem);
+    visitados.add(verticeOrigem);
 
-        while (!pilha.isEmpty()) {
-            Vertice atual = pilha.peek();
+    while (!pilha.isEmpty()) {
 
-            if (atual.equals(verticeDestino)) break;
+        Vertice atual = pilha.peek();
 
-            List<Vertice> adjacencias =  atual.getAdjacencias();
-            List<Vertice> adjacenciasOrdenadas = adjacencias
-                    .stream()
-                    .sorted(Comparator.comparing(Vertice::getNome))
-                    .toList();
+        System.out.println("Visitando: " + atual.getNome());
 
-            //Pegue a primeira adjacência não visitada
-            Optional<Vertice> proximo = adjacenciasOrdenadas.stream()
-                    .filter(a -> !visitados.contains(a))
-                    .findFirst();
-
-            if (proximo.isPresent()) {
-                Vertice adjacencia = proximo.get();
-                visitados.add(adjacencia);
-                percurso.append(adjacencia.getNome()).append(", ");
-                pilha.push(adjacencia);     // avança para o primeiro vizinho não visitado
-            } else {
-                pilha.pop();                   // vértice esgotado: remove da pilha
-            }
+        if (destino != null && atual.getNome().equals(destino)) {
+            break;
         }
 
-        System.out.println(percurso);
-        return visitados.stream().map(Vertice::getNome).toList();
+        Optional<Vertice> proximo = atual.getAdjacencias().stream()
+                .filter(v -> !visitados.contains(v))
+                .findFirst();
+
+        if (proximo.isPresent()) {
+            visitados.add(proximo.get());
+            pilha.push(proximo.get());
+        } else {
+            pilha.pop();
+        }
     }
 
-    public List<String> dfsRecursivo(String origem, String destino, List<Vertice> visitados) {
-        final List<Vertice> visitadosAtual = visitados != null ? visitados : new ArrayList<>();
+    return visitados.stream()
+            .map(Vertice::getNome)
+            .toList();
+}
+public List<String> dfsRecursivo(String origem, String destino, List<Vertice> visitados) {
 
-        Vertice v = encontraVertice(origem).orElseThrow(
-                () -> new IllegalArgumentException("Vertice " + origem + " não encontrado."));
-        visitadosAtual.add(v);
-
-        if (origem.equals(destino)) {
-            return visitadosAtual.stream().map(Vertice::getNome).toList();
-        }
-
-        // itera os vizinhos um a um — após backtrack, os já visitados são pulados pelo contains()
-        // espelhando o peek() + findFirst() do iterativo
-        for (Vertice adj : v.getAdjacencias()) {
-            if (visitadosAtual.contains(adj)) continue;
-
-            dfsRecursivo(adj.getNome(), destino, visitadosAtual);
-
-            // se destino foi encontrado em algum ramo, propaga o resultado
-            if (destino != null && visitadosAtual.stream().anyMatch(x -> x.getNome().equals(destino))) {
-                return visitadosAtual.stream().map(Vertice::getNome).toList();
-            }
-        }
-
-        // vértice esgotado (sem vizinhos não visitados): retorna o percurso até aqui
-        return visitadosAtual.stream().map(Vertice::getNome).toList();
+    if (visitados == null) {
+        visitados = new ArrayList<>();
     }
 
+    Vertice atual = encontraVertice(origem).orElseThrow(
+            () -> new IllegalArgumentException("Vertice " + origem + " não encontrado."));
+
+    visitados.add(atual);
+
+    System.out.println("Visitando: " + atual.getNome());
+
+    if (destino != null && atual.getNome().equals(destino)) {
+        return visitados.stream()
+                .map(Vertice::getNome)
+                .toList();
+    }
+
+    for (Vertice adj : atual.getAdjacencias()) {
+
+        if (!visitados.contains(adj)) {
+            dfsRecursivo(adj.getNome(), destino, visitados);
+        }
+    }
+
+    return visitados.stream()
+            .map(Vertice::getNome)
+            .toList();
+}
 
     public int encontraComprimentoCaminho(String... caminho) {
         if (!ePonderado) {
