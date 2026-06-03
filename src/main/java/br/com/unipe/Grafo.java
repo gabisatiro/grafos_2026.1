@@ -388,6 +388,44 @@ public class Grafo {
         return visitadosAtual.stream().map(Vertice::getNome).toList();
     }
 
+    public List<String> bfs(String origem, String destino) {
+
+    Vertice verticeOrigem = encontraVertice(origem).orElseThrow(
+            () -> new IllegalArgumentException("Vertice " + origem + " não encontrado."));
+
+    Vertice verticeDestino = destino == null ? null : encontraVertice(destino).orElseThrow(
+            () -> new IllegalArgumentException("Vertice " + destino + " não encontrado."));
+
+    Queue<Vertice> fila = new LinkedList<>();
+    List<Vertice> visitados = new ArrayList<>();
+
+    fila.add(verticeOrigem);
+    visitados.add(verticeOrigem);
+
+    while (!fila.isEmpty()) {
+
+        Vertice atual = fila.poll();
+
+        System.out.println("Visitando: " + atual.getNome());
+
+        if (atual.equals(verticeDestino)) {
+            break;
+        }
+
+        for (Vertice adj : atual.getAdjacencias()) {
+
+            if (!visitados.contains(adj)) {
+                visitados.add(adj);
+                fila.add(adj);
+            }
+        }
+    }
+
+    return visitados.stream()
+            .map(Vertice::getNome)
+            .toList();
+}
+
 
     public int encontraComprimentoCaminho(String... caminho) {
         if (!ePonderado) {
